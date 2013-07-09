@@ -170,14 +170,12 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -p /sbin/ldconfig
 
 %files -n libavtools
-%manifest packaging/libavtools.manifest
 %defattr(-,root,root,-)
 %{_bindir}/av*
 %{_bindir}/ffmpeg
 %{_datadir}/avconv/*.avpreset
 
 %files -n libavcodec
-%manifest packaging/libavcodec.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavcodec.so.*
 %{_datadir}/license/libavcodec
@@ -185,7 +183,6 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavcodec -p /sbin/ldconfig
 
 %files -n libavformat
-%manifest packaging/libavformat.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavformat.so.*
 %{_datadir}/license/libavformat
@@ -193,7 +190,6 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavformat -p /sbin/ldconfig
 
 %files -n libavutil
-%manifest packaging/libavutil.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavutil.so.*
 %{_datadir}/license/libavutil
@@ -201,7 +197,6 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavutil -p /sbin/ldconfig
 
 %files -n libavfilter
-%manifest packaging/libavfilter.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavfilter.so.*
 %{_datadir}/license/libavfilter
@@ -209,7 +204,6 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavfilter -p /sbin/ldconfig
 
 %files -n libswscale
-%manifest packaging/libswscale.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libswscale.so.*
 %{_datadir}/license/libswscale
