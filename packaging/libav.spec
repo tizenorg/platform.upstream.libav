@@ -214,28 +214,28 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %defattr(-,root,root,-)
 %_includedir/libavcodec/*
 %_libdir/libavcodec.so
-%_libdir/pkgconfig/libavcodec.pc
+#%_libdir/pkgconfig/libavcodec.pc
 
 %files -n libavformat-devel
 %defattr(-,root,root,-)
 %_includedir/libavformat/*
 %_libdir/libavformat.so
-%_libdir/pkgconfig/libavformat.pc
+#%_libdir/pkgconfig/libavformat.pc
 
 %files -n libavutil-devel
 %defattr(-,root,root,-)
 %_includedir/libavutil/*
 %_libdir/libavutil.so
-%_libdir/pkgconfig/libavutil.pc
+#%_libdir/pkgconfig/libavutil.pc
 
 %files -n libavfilter-devel
 %defattr(-,root,root,-)
 %_includedir/libavfilter/*
 %_libdir/libavfilter.so
-%_libdir/pkgconfig/libavfilter.pc
+#%_libdir/pkgconfig/libavfilter.pc
 
 %files -n libswscale-devel
 %defattr(-,root,root,-)
 %_includedir/libswscale/*
 %_libdir/libswscale.so
-%_libdir/pkgconfig/libswscale.pc
+#%_libdir/pkgconfig/libswscale.pc
