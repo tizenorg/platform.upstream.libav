@@ -1,0 +1,60 @@
+#!/bin/sh -xe
+# clean
+clean()
+{
+	cd ${SRCDIR}/package
+	./emulator_configure.sh
+
+	cd ${SRCDIR}/
+	if test -e "Makefile"
+	then
+		make distclean
+	fi
+
+	rm -rf ${SRCDIR}/binary
+	rm -rf ${SRCDIR}/*.zip
+	rm -rf ${SRCDIR}/*.tar.gz
+}
+
+# build
+build()
+{
+	cd ${SRCDIR}/package
+	./emulator_configure.sh
+
+	cd ${SRCDIR}
+	make install
+
+	if [ $? -eq 0 ]
+	then
+		echo "libav build success"
+	else
+		echo "libav build failure"
+		exit 1
+	fi
+}
+
+# install
+install()
+{
+	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/
+	LIB_DIR=${SRCDIR}/package/libav.package.${TARGET_OS}/data/tools/emulator/bin/
+
+	mkdir -p ${DEV_DIR}
+	mkdir -p ${LIB_DIR}
+
+	cd ${SRCDIR}/binary
+
+	cp -pPR include ${DEV_DIR}/
+	cp -pPR lib ${DEV_DIR}/
+	cp -pPR bin/avcodec-emul*.dll ${LIB_DIR}/
+	cp -pPR bin/avformat-emul*.dll ${LIB_DIR}/
+	cp -pPR bin/avutil-emul*.dll ${LIB_DIR}/
+	cp -pPR bin/avresample-emul*.dll ${LIB_DIR}/
+}
+
+[ "$1" = "clean" ] && clean
+[ "$1" = "build" ] && build
+[ "$1" = "install" ] && install
+
+echo "success"
