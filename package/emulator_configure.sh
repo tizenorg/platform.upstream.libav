@@ -30,7 +30,7 @@ esac
  --prefix=${bindir} --arch=x86 --build-suffix=${emul_suffix} \
  --disable-static --enable-shared --enable-pic --enable-optimizations \
  --disable-gpl --disable-doc --disable-avserver --disable-avplay --disable-avconv --disable-avprobe \
- --disable-everything --disable-network \
+ --disable-everything --disable-network --disable-yasm \
  --enable-encoder=aac --enable-encoder=h263 --enable-encoder=h263p \
  --enable-encoder=mpeg4 --enable-encoder=msmpeg4v2 --enable-encoder=msmpeg4v3 \
  --enable-decoder=aac --enable-decoder=mp3 --enable-decoder=mp3adu \
