@@ -11,7 +11,6 @@ clean()
 		make distclean
 	fi
 
-	rm -rf ${SRCDIR}/binary
 	rm -rf ${SRCDIR}/*.zip
 	rm -rf ${SRCDIR}/*.tar.gz
 }
@@ -43,14 +42,14 @@ install()
 	mkdir -p ${DEV_DIR}
 	mkdir -p ${LIB_DIR}
 
-	cd ${SRCDIR}/binary
+	cd ${SRCDIR}
 
 	cp -pPR include ${DEV_DIR}/
 	cp -pPR lib ${DEV_DIR}/
-	cp -pPR lib/libavcodec-emul.so.*.* ${LIB_DIR}/
-	cp -pPR lib/libavformat-emul.so.*.* ${LIB_DIR}/
-	cp -pPR lib/libavutil-emul.so.*.* ${LIB_DIR}/
-	cp -pPR lib/libavresample-emul.so.*.* ${LIB_DIR}/
+	cp -pPR lib/libavcodec-emul.so.54 ${LIB_DIR}/
+	cp -pPR lib/libavformat-emul.so.54 ${LIB_DIR}/
+	cp -pPR lib/libavutil-emul.so.52 ${LIB_DIR}/
+	cp -pPR lib/libavresample-emul.so.1 ${LIB_DIR}/
 }
 
 [ "$1" = "clean" ] && clean
