@@ -15,6 +15,7 @@ Description: libav development binaries to build Tizen Emulator
 Package: libav-dev
 OS: windows-32, windows-64
 Build-host-os: windows-32
+Build-dependency: emulator-lib-dev
 Description: libav development binaries to build Tizen Emulator
 
 Package: libav-dev
