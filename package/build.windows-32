@@ -1,7 +1,17 @@
 #!/bin/sh -xe
+# set build_env
+set_build_env()
+{
+	# set pkg-config location
+	PURIFIED_ROOTDIR=`TEMP=\`echo "${ROOTDIR}" | cut -c-2 | sed "s/[:/]//g" | awk {'print tolower ($_)'}\`; echo \`echo "${ROOTDIR}" | sed "s/^../\/${TEMP}/"\``
+	export PATH=$PATH:$PURIFIED_ROOTDIR/gtk-bundle_2.24.10/bin
+}
+
 # clean
 clean()
 {
+	set_build_env
+
 	cd ${SRCDIR}/package
 	./emulator_configure.sh
 
@@ -18,6 +28,8 @@ clean()
 # build
 build()
 {
+	set_build_env
+
 	cd ${SRCDIR}/package
 	./emulator_configure.sh
 
