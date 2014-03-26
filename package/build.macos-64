@@ -33,9 +33,36 @@ build()
 	fi
 }
 
+# change loader path
+change_loader_path()
+{
+	CHANGE_TOOL=install_name_tool
+
+	cd ${SRCDIR}/lib
+
+	echo "change loader path"
+	# libavformat-emul
+	${CHANGE_TOOL} -id @loader_path/libavformat-emul.54.dylib libavformat-emul.54.dylib
+	${CHANGE_TOOL} -change .//lib/libavcodec-emul.54.dylib @loader_path/libavcodec-emul.54.dylib libavformat-emul.54.dylib
+	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavformat-emul.54.dylib
+
+	# libavcodec-emul
+	${CHANGE_TOOL} -id @loader_path/libavcodec-emul.54.dylib libavcodec-emul.54.dylib
+	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavcodec-emul.54.dylib
+
+	# libavutil-emul
+	${CHANGE_TOOL} -id @loader_path/libavutil-emul.52.dylib libavutil-emul.52.dylib
+
+	# libavresample-emul
+	${CHANGE_TOOL} -id @loader_path/libavresample-emul.1.dylib libavresample-emul.1.dylib
+	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavresample-emul.1.dylib
+}
+
 # install
 install()
 {
+	change_loader_path
+
 	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/
 	LIB_DIR=${SRCDIR}/package/libav.package.${TARGET_OS}/data/tools/emulator/bin/
 
@@ -46,10 +73,10 @@ install()
 
 	cp -pPR include ${DEV_DIR}/
 	cp -pPR lib ${DEV_DIR}/
-	cp -pPR lib/libavcodec-emul.*.*.*.dylib ${LIB_DIR}/
-	cp -pPR lib/libavformat-emul.*.*.*.dylib ${LIB_DIR}/
-	cp -pPR lib/libavutil-emul.*.*.*.dylib ${LIB_DIR}/
-	cp -pPR lib/libavresample-emul.*.*.*.dylib ${LIB_DIR}/
+	cp -p lib/libavcodec-emul.54.dylib ${LIB_DIR}/
+	cp -p lib/libavformat-emul.54.dylib ${LIB_DIR}/
+	cp -p lib/libavutil-emul.52.dylib ${LIB_DIR}/
+	cp -p lib/libavresample-emul.1.dylib ${LIB_DIR}/
 }
 
 [ "$1" = "clean" ] && clean
