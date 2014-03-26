@@ -46,10 +46,10 @@ install()
 
 	cp -pPR include ${DEV_DIR}/
 	cp -pPR lib ${DEV_DIR}/
-	cp -pPR lib/libavcodec-emul.so.54 ${LIB_DIR}/
-	cp -pPR lib/libavformat-emul.so.54 ${LIB_DIR}/
-	cp -pPR lib/libavutil-emul.so.52 ${LIB_DIR}/
-	cp -pPR lib/libavresample-emul.so.1 ${LIB_DIR}/
+	cp -p lib/libavcodec-emul.so.54 ${LIB_DIR}/
+	cp -p lib/libavformat-emul.so.54 ${LIB_DIR}/
+	cp -p lib/libavutil-emul.so.52 ${LIB_DIR}/
+	cp -p lib/libavresample-emul.so.1 ${LIB_DIR}/
 }
 
 [ "$1" = "clean" ] && clean
