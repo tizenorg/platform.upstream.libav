@@ -58,10 +58,10 @@ install()
 
 	cp -pPR include ${DEV_DIR}/
 	cp -pPR lib ${DEV_DIR}/
-	cp -pPR bin/avcodec-emul*.dll ${LIB_DIR}/
-	cp -pPR bin/avformat-emul*.dll ${LIB_DIR}/
-	cp -pPR bin/avutil-emul*.dll ${LIB_DIR}/
-	cp -pPR bin/avresample-emul*.dll ${LIB_DIR}/
+	cp -p bin/avcodec-emul*.dll ${LIB_DIR}/
+	cp -p bin/avformat-emul*.dll ${LIB_DIR}/
+	cp -p bin/avutil-emul*.dll ${LIB_DIR}/
+	cp -p bin/avresample-emul*.dll ${LIB_DIR}/
 }
 
 [ "$1" = "clean" ] && clean
