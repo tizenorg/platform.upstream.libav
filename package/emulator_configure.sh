@@ -3,7 +3,7 @@
 # OS specific
 echo "##### checking for os... targetos $targetos"
 targetos=`uname -s`
-bin_dir=./
+bin_dir=$1
 
 cd ../
 echo ""
