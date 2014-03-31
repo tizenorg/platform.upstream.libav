@@ -1,0 +1,19 @@
+#!/bin/sh -xe
+
+PKG_INSTALL_PATH=${INSTALLED_PATH}
+if [ -z $PKG_INSTALL_PATH ]
+then
+   exit 2;
+fi
+echo $PKG_INSTALL_PATH
+
+## adjust pkgconfig (.pc) file
+
+LIBAV_DIR=${PKG_INSTALL_PATH}/libav
+PKG_CONFIG_DIR=${LIBAV_DIR}/lib/pkgconfig
+
+for pc in `ls ${PKG_CONFIG_DIR}`; do
+    echo "$pc"
+    sed -i '/^prefix=/!b;c\prefix=${LIBDIR}/' ${PKG_CONFIG_DIR}/$pc
+    sed -i "1s|^|LIBDIR=${LIBAV_DIR}\n|" ${PKG_CONFIG_DIR}/$pc
+done
