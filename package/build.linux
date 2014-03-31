@@ -5,7 +5,7 @@ clean()
 	cd ${SRCDIR}/package
 	./emulator_configure.sh
 
-	cd ${SRCDIR}/
+	cd ${SRCDIR}
 	if test -e "Makefile"
 	then
 		make distclean
@@ -19,7 +19,7 @@ clean()
 build()
 {
 	cd ${SRCDIR}/package
-	./emulator_configure.sh
+	./emulator_configure.sh ${SRCDIR} 
 
 	cd ${SRCDIR}
 	make install
@@ -36,7 +36,7 @@ build()
 # install
 install()
 {
-	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/
+	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/libav
 	LIB_DIR=${SRCDIR}/package/libav.package.${TARGET_OS}/data/tools/emulator/bin/
 
 	mkdir -p ${DEV_DIR}
