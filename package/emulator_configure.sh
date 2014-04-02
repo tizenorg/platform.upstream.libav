@@ -3,7 +3,17 @@
 # OS specific
 echo "##### checking for os... targetos $targetos"
 targetos=`uname -s`
-bin_dir=$1
+
+# set TIZEN_SDK_DEV_PATH
+if [ ! -z $1 ]
+then
+	prefix=$1
+elif [ -z ${TIZEN_SDK_DEV_PATH} ]
+then
+	prefix=$HOME/tizen-sdk-dev
+else
+	prefix=${TIZEN_SDK_DEV_PATH}
+fi
 
 cd ../
 echo ""
@@ -23,7 +33,7 @@ append_configure="--cc=cc --extra-cflags=-mmacosx-version-min=10.4"
 esac
 
 ./configure \
- --prefix=${bin_dir} --arch=x86 --build-suffix=${emul_suffix} \
+ --prefix=${prefix} --arch=x86 --build-suffix=${emul_suffix} \
  --disable-static --enable-shared --enable-pic --enable-optimizations \
  --disable-gpl --disable-doc --disable-avserver --disable-avplay --disable-avconv --disable-avprobe \
  --disable-everything --disable-network --disable-yasm \
