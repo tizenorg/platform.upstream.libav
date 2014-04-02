@@ -10,9 +10,9 @@ then
 	prefix=$1
 elif [ -z ${TIZEN_SDK_DEV_PATH} ]
 then
-	prefix=$HOME/tizen-sdk-dev
+	prefix=$HOME/tizen-sdk-dev/distrib
 else
-	prefix=${TIZEN_SDK_DEV_PATH}
+	prefix=${TIZEN_SDK_DEV_PATH}/distrib
 fi
 
 cd ../
