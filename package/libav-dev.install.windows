@@ -1,0 +1,13 @@
+@echo off
+
+setlocal enabledelayedexpansion
+set PC_PATH=%INSTALLED_PATH%\*.pc
+
+echo %PC_PATH%
+
+FOR /F %%i in ('dir /s /b %PC_PATH%') DO (
+echo %%i
+echo prefix=%INSTALLED_PATH% >> %%i.bak
+findstr /V "^prefix" %%i >> %%i.bak
+move /Y %%i.bak %%i 
+)

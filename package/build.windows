@@ -60,7 +60,7 @@ change_prefix()
 # install
 install()
 {
-	change_prefix
+	#change_prefix
 
 	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/libav
 	LIB_DIR=${SRCDIR}/package/libav.package.${TARGET_OS}/data/tools/emulator/bin/
