@@ -45,23 +45,9 @@ build()
 	fi
 }
 
-# change prefix in *.pc
-change_prefix()
-{
-	PKG_CONFIG_DIR=${SRCDIR}/lib/pkgconfig
-
-	for pc in `ls ${PKG_CONFIG_DIR}`; do
-		#echo $pc
-		sed -i '/^prefix=/!b;c\prefix=${LIBDIR}/' ${PKG_CONFIG_DIR}/$pc
-		sed -i "1s|^|LIBDIR=${ROOTDIR}\n|" ${PKG_CONFIG_DIR}/$pc
-	done
-}
-
 # install
 install()
 {
-	change_prefix
-
 	DEV_DIR=${SRCDIR}/package/libav-dev.package.${TARGET_OS}/data/libav
 	LIB_DIR=${SRCDIR}/package/libav.package.${TARGET_OS}/data/tools/emulator/bin/
 
