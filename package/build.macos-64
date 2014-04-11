@@ -43,19 +43,19 @@ change_loader_path()
 	echo "change loader path"
 	# libavformat-emul
 	${CHANGE_TOOL} -id @loader_path/libavformat-emul.54.dylib libavformat-emul.54.dylib
-	${CHANGE_TOOL} -change .//lib/libavcodec-emul.54.dylib @loader_path/libavcodec-emul.54.dylib libavformat-emul.54.dylib
-	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavformat-emul.54.dylib
+	${CHANGE_TOOL} -change ${SRCDIR}/lib/libavcodec-emul.54.dylib @loader_path/libavcodec-emul.54.dylib libavformat-emul.54.dylib
+	${CHANGE_TOOL} -change ${SRCDIR}/lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavformat-emul.54.dylib
 
 	# libavcodec-emul
 	${CHANGE_TOOL} -id @loader_path/libavcodec-emul.54.dylib libavcodec-emul.54.dylib
-	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavcodec-emul.54.dylib
+	${CHANGE_TOOL} -change ${SRCDIR}/lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavcodec-emul.54.dylib
 
 	# libavutil-emul
 	${CHANGE_TOOL} -id @loader_path/libavutil-emul.52.dylib libavutil-emul.52.dylib
 
 	# libavresample-emul
 	${CHANGE_TOOL} -id @loader_path/libavresample-emul.1.dylib libavresample-emul.1.dylib
-	${CHANGE_TOOL} -change .//lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavresample-emul.1.dylib
+	${CHANGE_TOOL} -change ${SRCDIR}/lib/libavutil-emul.52.dylib @loader_path/libavutil-emul.52.dylib libavresample-emul.1.dylib
 }
 
 # install
