@@ -142,10 +142,21 @@ export CONFIGURE_OPTIONS+="--disable-mmx"
 %else
 %endif
 
+%ifarch aarch64
+export CONFIGURE_OPTIONS+=" --disable-neon"
+%endif
+
 CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
 
 %ifarch %{arm}
-./configure --prefix=%{_prefix} --libdir=%_libdir  --shlibdir=%_libdir $CONFIGURE_OPTIONS --extra-cflags="-mfpu=neon"
+./configure \
+	--prefix=%{_prefix} \
+	--libdir=%_libdir \
+	--shlibdir=%_libdir \
+%ifnarch aarch64
+	--extra-cflags="-mfpu=neon" \
+%endif
+	$CONFIGURE_OPTIONS
 %else
 ./configure --prefix=%{_prefix} --shlibdir=%_libdir --libdir=%_libdir  $CONFIGURE_OPTIONS
 %endif
