@@ -1,7 +1,7 @@
 Name:       libav
 Summary:    AV codec lib
 Version:    9.8
-Release:    1
+Release:    0
 Group:      Multimedia/Libraries
 URL:        http://libav.org
 License:    LGPL-2.1+
@@ -97,46 +97,48 @@ development files for libswsacle
 %prep
 %setup -q
 
-export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
---disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
---disable-zlib    --disable-network \
---disable-avdevice \
---disable-bsfs      --disable-filters \
---enable-filter=buffer  --enable-filter=buffersink      --enable-filter=crop \
---enable-filter=hflip   --enable-filter=lut     --enable-filter=lutyuv \
---enable-filter=lutrgb  --enable-filter=overlay --enable-filter=scale \
---enable-filter=transpose       --enable-filter=unsharp --enable-filter=vflip \
---disable-protocols \
---disable-avresample \
---enable-protocol=file \
---disable-encoders \
+
+%build
+
+export CONFIGURE_OPTIONS="\
+--disable-static            --disable-nonfree            --disable-gpl \
+--disable-version3          --disable-devices            --disable-doc \
+--disable-zlib              --disable-network            --disable-avdevice \
+--disable-bsfs              --disable-yasm               --disable-avresample \
 --disable-muxers \
+--disable-filters \
+--enable-filter=buffer      --enable-filter=buffersink  --enable-filter=crop \
+--enable-filter=hflip       --enable-filter=lut         --enable-filter=lutyuv \
+--enable-filter=lutrgb      --enable-filter=overlay     --enable-filter=scale \
+--enable-filter=transpose   --enable-filter=unsharp     --enable-filter=vflip \
+--disable-protocols \
+--enable-protocol=file \
 --disable-parsers \
---enable-parser=aac     --enable-parser=h264            --enable-parser=mpegaudio \
---enable-parser=h263    --enable-parser=mpeg4video      --enable-parser=mpegvideo \
+--enable-parser=aac         --enable-parser=h264        --enable-parser=mpegaudio \
+--enable-parser=h263        --enable-parser=mpeg4video  --enable-parser=mpegvideo \
 --disable-demuxers \
---enable-demuxer=aac    --enable-demuxer=h264   --enable-demuxer=mpegts \
---enable-demuxer=amr    --enable-demuxer=m4v    --enable-demuxer=mpegtsraw \
---enable-demuxer=asf    --enable-demuxer=mmf    --enable-demuxer=mpegvideo \
---enable-demuxer=avi    --enable-demuxer=mov    --enable-demuxer=ogg \
---enable-demuxer=flac   --enable-demuxer=mp3    --enable-demuxer=wav \
---enable-demuxer=h263   --enable-demuxer=mpegps --enable-demuxer=matroska \
---enable-demuxer=dv	--enable-demuxer=flv \
+--enable-demuxer=aac        --enable-demuxer=h264       --enable-demuxer=mpegts \
+--enable-demuxer=amr        --enable-demuxer=m4v        --enable-demuxer=mpegtsraw \
+--enable-demuxer=asf        --enable-demuxer=mmf        --enable-demuxer=mpegvideo \
+--enable-demuxer=avi        --enable-demuxer=mov        --enable-demuxer=ogg \
+--enable-demuxer=flac       --enable-demuxer=mp3        --enable-demuxer=wav \
+--enable-demuxer=h263       --enable-demuxer=mpegps     --enable-demuxer=matroska \
+--enable-demuxer=dv         --enable-demuxer=flv \
 --disable-decoders \
---enable-decoder=alac   --enable-decoder=h264           --enable-decoder=wmv1 \
---enable-decoder=flac   --enable-decoder=mpeg4          --enable-decoder=wmv2 \
---enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
---enable-decoder=vc1	--enable-decoder=flv \
---enable-decoder=h263i  --enable-decoder=theora  \
---enable-decoder=pcm_alaw  --enable-decoder=pcm_mulaw  \
---enable-encoder=h263   --enable-encoder=h263p  --enable-encoder=mpeg4   \
---enable-decoder=bmp  --enable-encoder=bmp       \
---enable-decoder=tiff \
---enable-decoder=mp3  --enable-decoder=amrnb    \
---enable-encoder=aac  --enable-decoder=aac      \
---enable-swscale        --disable-yasm	 \
---enable-fft    --enable-rdft   --enable-mdct   --enable-neon \
+--enable-decoder=alac       --enable-decoder=h264       --enable-decoder=wmv1 \
+--enable-decoder=flac       --enable-decoder=mpeg4      --enable-decoder=wmv2 \
+--enable-decoder=h263       --enable-decoder=mpegvideo  --enable-decoder=wmv3 \
+--enable-decoder=vc1        --enable-decoder=flv        --enable-decoder=amrnb \
+--enable-decoder=tiff       --enable-decoder=mp3        --enable-decoder=h263i \
+--enable-decoder=aac        --enable-decoder=theora     --enable-decoder=pcm_mulaw \
+--enable-decoder=pcm_alaw   --enable-decoder=bmp \
+--disable-encoders \
+--enable-encoder=h263       --enable-encoder=h263p      --enable-encoder=mpeg4 \
+--enable-encoder=bmp        --enable-encoder=aac \
+--enable-swscale            --enable-fft                --enable-rdft \
+--enable-mdct               --enable-neon               --enable-shared \
 "
+
 %ifarch %{arm}
 export CONFIGURE_OPTIONS+="--disable-mmx"
 %else
@@ -150,36 +152,42 @@ CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\
 
 %ifarch %{arm}
 ./configure \
-	--prefix=%{_prefix} \
-	--libdir=%_libdir \
-	--shlibdir=%_libdir \
+    --prefix=%{_prefix} \
+    --libdir=%_libdir \
+    --shlibdir=%_libdir \
 %ifnarch aarch64
-	--extra-cflags="-mfpu=neon" \
+    --extra-cflags="-mfpu=neon" \
 %endif
-	$CONFIGURE_OPTIONS
+    $CONFIGURE_OPTIONS
 %else
 ./configure --prefix=%{_prefix} --shlibdir=%_libdir --libdir=%_libdir  $CONFIGURE_OPTIONS
 %endif
 
-%build
-
-
-make %{?jobs:-j%jobs}
+%__make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
 %make_install
-mkdir -p %{buildroot}/%{_datadir}/license
-cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libavcodec
-cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libavformat
-cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libavutil
-cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libavfilter
-cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libswscale
 
 
 %post -p /sbin/ldconfig
-
 %postun -p /sbin/ldconfig
+
+%post -n libavcodec -p /sbin/ldconfig
+%postun -n libavcodec -p /sbin/ldconfig
+
+%post -n libavformat -p /sbin/ldconfig
+%postun -n libavformat -p /sbin/ldconfig
+
+%post -n libavutil -p /sbin/ldconfig
+%postun -n libavutil -p /sbin/ldconfig
+
+%post -n libavfilter -p /sbin/ldconfig
+%postun -n libavfilter -p /sbin/ldconfig
+
+%post -n libswscale -p /sbin/ldconfig
+%postun -n libswscale -p /sbin/ldconfig
+
 
 %files -n libavtools
 %defattr(-,root,root,-)
@@ -189,37 +197,27 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %files -n libavcodec
 %defattr(-,root,root,-)
 %{_libdir}/libavcodec.so.*
-%{_datadir}/license/libavcodec
-%post -n libavcodec -p /sbin/ldconfig
-%postun -n libavcodec -p /sbin/ldconfig
+%license COPYING.LGPLv2.1
 
 %files -n libavformat
 %defattr(-,root,root,-)
 %{_libdir}/libavformat.so.*
-%{_datadir}/license/libavformat
-%post -n libavformat -p /sbin/ldconfig
-%postun -n libavformat -p /sbin/ldconfig
+%license COPYING.LGPLv2.1
 
 %files -n libavutil
 %defattr(-,root,root,-)
 %{_libdir}/libavutil.so.*
-%{_datadir}/license/libavutil
-%post -n libavutil -p /sbin/ldconfig
-%postun -n libavutil -p /sbin/ldconfig
+%license COPYING.LGPLv2.1
 
 %files -n libavfilter
 %defattr(-,root,root,-)
 %{_libdir}/libavfilter.so.*
-%{_datadir}/license/libavfilter
-%post -n libavfilter -p /sbin/ldconfig
-%postun -n libavfilter -p /sbin/ldconfig
+%license COPYING.LGPLv2.1
 
 %files -n libswscale
 %defattr(-,root,root,-)
 %{_libdir}/libswscale.so.*
-%{_datadir}/license/libswscale
-%post -n libswscale -p /sbin/ldconfig
-%postun -n libswscale -p /sbin/ldconfig
+%license COPYING.LGPLv2.1
 
 %files -n libavcodec-devel
 %defattr(-,root,root,-)
