@@ -1,33 +1,33 @@
 Name:       libav
 Summary:    AV codec lib
 Version:    9.8
-Release:    1
-Group:      Multimedia/Libraries
+Release:    0
+Group:      Multimedia/Codec
 URL:        http://libav.org
 License:    LGPL-2.1+
 Source0:    %{name}-%{version}.tar.gz
-
+Source1001: %{name}.manifest
 
 %description
 AV codec library
 
 %package -n libavtools
 Summary:    AV tools
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libavtools
 AV tools binary
 
 %package -n libavcodec
 Summary:    AV codec lib
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libavcodec
 AV codec library
 
 %package -n libavcodec-devel
 Summary:    AV codec lib (devel)
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 Requires:   libavcodec = %{version}-%{release}
 
 %description -n libavcodec-devel
@@ -35,14 +35,14 @@ AV codec library (devel)
 
 %package -n libavformat
 Summary:    AV format lib
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libavformat
 AV format library
 
 %package -n libavformat-devel
 Summary:    AV format lib (devel)
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 Requires:   libavformat = %{version}-%{release}
 
 %description -n libavformat-devel
@@ -50,14 +50,14 @@ AV format library (devel)
 
 %package -n libavutil
 Summary:    AV util lib
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libavutil
 AV util library
 
 %package -n libavutil-devel
 Summary:    AV util lib (devel)
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 Requires:   libavutil = %{version}-%{release}
 
 %description -n libavutil-devel
@@ -65,14 +65,14 @@ AV util library (devel)
 
 %package -n libavfilter
 Summary:    AV util lib
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libavfilter
 AV filter library
 
 %package -n libavfilter-devel
 Summary:    AV util lib (devel)
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 Requires:   libavfilter = %{version}-%{release}
 
 %description -n libavfilter-devel
@@ -80,23 +80,24 @@ AV filter library (devel)
 
 %package -n libswscale
 Summary:    SW scale lib
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 
 %description -n libswscale
 development files for libswsacle
 
 %package -n libswscale-devel
 Summary:    SW scale lib (devel)
-Group:      Multimedia/Libraries
+Group:      Multimedia/Codec
 Requires:   libswscale = %{version}-%{release}
 
 %description -n libswscale-devel
 development files for libswsacle
 
-
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
+%build
 export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
 --disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
 --disable-zlib    --disable-network \
@@ -150,21 +151,18 @@ CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\
 
 %ifarch %{arm}
 ./configure \
-	--prefix=%{_prefix} \
-	--libdir=%_libdir \
-	--shlibdir=%_libdir \
+       --prefix=%{_prefix} \
+       --libdir=%{_libdir} \
+       --shlibdir=%{_libdir} \
 %ifnarch aarch64
 	--extra-cflags="-mfpu=neon" \
 %endif
 	$CONFIGURE_OPTIONS
 %else
-./configure --prefix=%{_prefix} --shlibdir=%_libdir --libdir=%_libdir  $CONFIGURE_OPTIONS
+./configure --prefix=%{_prefix} --shlibdir=%{_libdir} --libdir=%{_libdir}  $CONFIGURE_OPTIONS
 %endif
 
-%build
-
-
-make %{?jobs:-j%jobs}
+%__make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
@@ -176,18 +174,19 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libavfilter
 cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}/license/libswscale
 
-
 %post -p /sbin/ldconfig
 
 %postun -p /sbin/ldconfig
 
 %files -n libavtools
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_bindir}/av*
 %{_datadir}/avconv/*.avpreset
 
 %files -n libavcodec
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/libavcodec.so.*
 %{_datadir}/license/libavcodec
 %post -n libavcodec -p /sbin/ldconfig
@@ -195,6 +194,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 
 %files -n libavformat
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/libavformat.so.*
 %{_datadir}/license/libavformat
 %post -n libavformat -p /sbin/ldconfig
@@ -202,6 +202,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 
 %files -n libavutil
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/libavutil.so.*
 %{_datadir}/license/libavutil
 %post -n libavutil -p /sbin/ldconfig
@@ -209,6 +210,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 
 %files -n libavfilter
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/libavfilter.so.*
 %{_datadir}/license/libavfilter
 %post -n libavfilter -p /sbin/ldconfig
@@ -216,6 +218,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 
 %files -n libswscale
 %defattr(-,root,root,-)
+%manifest %{name}.manifest
 %{_libdir}/libswscale.so.*
 %{_datadir}/license/libswscale
 %post -n libswscale -p /sbin/ldconfig
@@ -223,30 +226,35 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 
 %files -n libavcodec-devel
 %defattr(-,root,root,-)
-%_includedir/libavcodec/*
-%_libdir/libavcodec.so
-%_libdir/pkgconfig/libavcodec.pc
+%manifest %{name}.manifest
+%{_includedir}/libavcodec/*
+%{_libdir}/libavcodec.so
+%{_libdir}/pkgconfig/libavcodec.pc
 
 %files -n libavformat-devel
 %defattr(-,root,root,-)
-%_includedir/libavformat/*
-%_libdir/libavformat.so
-%_libdir/pkgconfig/libavformat.pc
+%manifest %{name}.manifest
+%{_includedir}/libavformat/*
+%{_libdir}/libavformat.so
+%{_libdir}/pkgconfig/libavformat.pc
 
 %files -n libavutil-devel
 %defattr(-,root,root,-)
-%_includedir/libavutil/*
-%_libdir/libavutil.so
-%_libdir/pkgconfig/libavutil.pc
+%manifest %{name}.manifest
+%{_includedir}/libavutil/*
+%{_libdir}/libavutil.so
+%{_libdir}/pkgconfig/libavutil.pc
 
 %files -n libavfilter-devel
 %defattr(-,root,root,-)
-%_includedir/libavfilter/*
-%_libdir/libavfilter.so
-%_libdir/pkgconfig/libavfilter.pc
+%manifest %{name}.manifest
+%{_includedir}/libavfilter/*
+%{_libdir}/libavfilter.so
+%{_libdir}/pkgconfig/libavfilter.pc
 
 %files -n libswscale-devel
 %defattr(-,root,root,-)
-%_includedir/libswscale/*
-%_libdir/libswscale.so
-%_libdir/pkgconfig/libswscale.pc
+%manifest %{name}.manifest
+%{_includedir}/libswscale/*
+%{_libdir}/libswscale.so
+%{_libdir}/pkgconfig/libswscale.pc
