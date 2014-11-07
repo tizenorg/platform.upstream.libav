@@ -1,7 +1,7 @@
 Name:       libav
 Summary:    AV codec lib
-Version:    9.8
-Release:    1
+Version:    9.16
+Release:    0
 Group:      Multimedia/Libraries
 URL:        http://libav.org
 License:    LGPL-2.1+
@@ -164,7 +164,7 @@ CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\
 %build
 
 
-make %{?jobs:-j%jobs}
+%__make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
