@@ -137,29 +137,22 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
 --enable-swscale        --disable-yasm	 \
 --enable-fft    --enable-rdft   --enable-mdct   --enable-neon \
 "
-%ifarch %{arm}
+%ifarch %{arm} aarch64
 export CONFIGURE_OPTIONS+="--disable-mmx"
 %else
-%endif
-
-%ifarch aarch64
-export CONFIGURE_OPTIONS+=" --disable-neon"
 %endif
 
 CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
 
 %ifarch %{arm}
+export CONFIGURE_OPTIONS+="--extra-cflags=-mfpu=neon"
+%endif
+
 ./configure \
-	--prefix=%{_prefix} \
-	--libdir=%_libdir \
-	--shlibdir=%_libdir \
-%ifnarch aarch64
-	--extra-cflags="-mfpu=neon" \
-%endif
-	$CONFIGURE_OPTIONS
-%else
-./configure --prefix=%{_prefix} --shlibdir=%_libdir --libdir=%_libdir  $CONFIGURE_OPTIONS
-%endif
+    --prefix=%{_prefix} \
+    --libdir=%_libdir \
+    --shlibdir=%_libdir \
+    $CONFIGURE_OPTIONS
 
 %build
 
