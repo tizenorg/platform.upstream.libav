@@ -1,6 +1,6 @@
 Name:       libav
 Summary:    AV codec lib
-Version:    9.16
+Version:    11
 Release:    0
 Group:      Multimedia/Libraries
 URL:        http://libav.org
