@@ -138,7 +138,7 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
 --enable-fft    --enable-rdft   --enable-mdct   --enable-neon \
 "
 %ifarch %{arm} aarch64
-export CONFIGURE_OPTIONS+="--disable-mmx"
+export CONFIGURE_OPTIONS+="--disable-mmx "
 %else
 %endif
 
