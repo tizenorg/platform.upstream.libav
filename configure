@@ -1477,6 +1477,7 @@ SYSTEM_FUNCS="
 TOOLCHAIN_FEATURES="
     as_dn_directive
     as_func
+    as_object_arch
     asm_mod_q
     attribute_may_alias
     attribute_packed
@@ -3281,6 +3282,7 @@ elif enabled x86; then
     case $cpu in
         i[345]86|pentium)
             cpuflags="-march=$cpu"
+            disable i686
             disable mmx
         ;;
         # targets that do NOT support nopl and conditional mov (cmov)
@@ -3870,6 +3872,11 @@ ra .dn d0.i16
 .unreq ra
 EOF
 
+    # llvm's integrated assembler supports .object_arch from llvm 3.5
+    [ "$objformat" = elf ] && check_as <<EOF && enable as_object_arch
+.object_arch armv4
+EOF
+
     [ $target_os != win32 ] && enabled_all armv6t2 shared !pic && enable_weak_pic
 
 elif enabled mips; then
@@ -4242,7 +4249,8 @@ enabled_any sndio_indev sndio_outdev && check_lib2 sndio.h sio_open -lsndio
 
 if enabled libcdio; then
     check_lib2 "cdio/cdda.h cdio/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio ||
-    check_lib2 "cdio/paranoia/cdda.h cdio/paranoia/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio
+    check_lib2 "cdio/paranoia/cdda.h cdio/paranoia/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio ||
+    die "ERROR: No usable libcdio/cdparanoia found"
 fi
 
 check_lib X11/Xlib.h XOpenDisplay -lX11 && enable xlib
@@ -4469,7 +4477,7 @@ enabled_all dxva2 CoTaskMemFree &&
     enable dxva2_lib
 
 ! enabled_any memalign posix_memalign aligned_malloc &&
-    enabled $simd_align_16 && enable memalign_hack
+    enabled simd_align_16 && enable memalign_hack
 
 map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 

@@ -927,6 +927,8 @@ static void rtsp_parse_transport(RTSPMessageHeader *reply, const char *p)
             p++;
 
         reply->nb_transports++;
+        if (reply->nb_transports >= RTSP_MAX_TRANSPORTS)
+            break;
     }
 }
 
@@ -1146,6 +1148,8 @@ start:
     if (content_length > 0) {
         /* leave some room for a trailing '\0' (useful for simple parsing) */
         content = av_malloc(content_length + 1);
+        if (!content)
+            return AVERROR(ENOMEM);
         ffurl_read_complete(rt->rtsp_hd, content, content_length);
         content[content_length] = '\0';
     }

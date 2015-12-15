@@ -172,7 +172,7 @@ static int on2avc_decode_band_scales(On2AVCContext *c, GetBitContext *gb)
             } else {
                 scale += get_vlc2(gb, c->scale_diff.table, 9, 3) - 60;
             }
-            if (scale < 0 || scale > 128) {
+            if (scale < 0 || scale > 127) {
                 av_log(c->avctx, AV_LOG_ERROR, "Invalid scale value %d\n",
                        scale);
                 return AVERROR_INVALIDDATA;
@@ -917,6 +917,10 @@ static av_cold int on2avc_decode_init(AVCodecContext *avctx)
     if (c->is_av500 && avctx->channels == 2) {
         av_log(avctx, AV_LOG_ERROR, "0x500 version should be mono\n");
         return AVERROR_INVALIDDATA;
+    }
+    if (avctx->channels > 2) {
+        av_log(avctx, AV_LOG_ERROR, "Only 1 or 2 channels are supported.\n");
+        return AVERROR(EINVAL);
     }
     if (avctx->channels == 2)
         av_log(avctx, AV_LOG_WARNING,

@@ -17,7 +17,7 @@ tests/data/vsynth1.yuv: tests/videogen$(HOSTEXESUF) | tests/data
 	$(M)$< $@
 
 tests/data/vsynth2.yuv: tests/rotozoom$(HOSTEXESUF) | tests/data
-	$(M)$< $(SRC_PATH)/tests/lena.pnm $@
+	$(M)$< $(SRC_PATH)/tests/reference.pnm $@
 
 tests/data/asynth% tests/data/vsynth%.yuv tests/vsynth%/00.pgm: TAG = GEN
 
@@ -128,7 +128,7 @@ $(FATE_AVCONV) $(FATE_SAMPLES_AVCONV): avconv$(EXESUF)
 ifdef SAMPLES
 FATE += $(FATE_SAMPLES)
 fate-rsync:
-	rsync -vaLW rsync://fate-suite.libav.org/fate-suite/ $(SAMPLES)
+	rsync -vaLW rsync://fate-suite.libav.org/fate-suite-11/ $(SAMPLES)
 else
 fate-rsync:
 	@echo "use 'make fate-rsync SAMPLES=/path/to/samples' to sync the fate suite"
