@@ -1325,11 +1325,21 @@ ARCH_EXT_LIST_X86="
     i686
 "
 
+ARCH_EXT_LIST_MIPS="
+    loongson
+    mips32r1
+    mips64r1
+    mips32r2
+    mips64r2
+    mips32r6
+    mips64r6
+"
+
 ARCH_EXT_LIST="
     $ARCH_EXT_LIST_ARM
+    $ARCH_EXT_LIST_MIPS
     $ARCH_EXT_LIST_PPC
     $ARCH_EXT_LIST_X86
-    loongson
     vis
 "
 
@@ -1477,6 +1487,7 @@ SYSTEM_FUNCS="
 TOOLCHAIN_FEATURES="
     as_dn_directive
     as_func
+    as_object_arch
     asm_mod_q
     attribute_may_alias
     attribute_packed
@@ -3281,6 +3292,7 @@ elif enabled x86; then
     case $cpu in
         i[345]86|pentium)
             cpuflags="-march=$cpu"
+            disable i686
             disable mmx
         ;;
         # targets that do NOT support nopl and conditional mov (cmov)
@@ -3307,6 +3319,7 @@ fi
 if [ "$cpu" != generic ]; then
     add_cflags  $cpuflags
     add_asflags $cpuflags
+    test "$cc_type" = "$ld_type" && add_ldflags $cpuflags
 fi
 
 # compiler sanity check
@@ -3870,11 +3883,29 @@ ra .dn d0.i16
 .unreq ra
 EOF
 
+    # llvm's integrated assembler supports .object_arch from llvm 3.5
+    [ "$objformat" = elf ] && check_as <<EOF && enable as_object_arch
+.object_arch armv4
+EOF
+
     [ $target_os != win32 ] && enabled_all armv6t2 shared !pic && enable_weak_pic
 
 elif enabled mips; then
 
     check_inline_asm loongson '"dmult.g $1, $2, $3"'
+
+    # make sure that only an instruction set is enabled
+    disable mips64r6 mips32r6 mips64r2 mips32r2 mips64r1 mips32r1
+
+    if enabled mips64; then
+        check_inline_asm mips64r6 '"dlsa $0, $0, $0, 1"' ||
+            check_inline_asm mips64r2 '"dext $0, $0, 0, 1"' ||
+                check_inline_asm mips64r1 '"daddi $0, $0, 0"'
+    else
+        check_inline_asm mips32r6 '"aui $0, $0, 0"' ||
+            check_inline_asm mips32r2 '"ext $0, $0, 0, 1"' ||
+                check_inline_asm mips32r1 '"addi $0, $0, 0"'
+    fi
 
 elif enabled parisc; then
 
@@ -4242,7 +4273,8 @@ enabled_any sndio_indev sndio_outdev && check_lib2 sndio.h sio_open -lsndio
 
 if enabled libcdio; then
     check_lib2 "cdio/cdda.h cdio/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio ||
-    check_lib2 "cdio/paranoia/cdda.h cdio/paranoia/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio
+    check_lib2 "cdio/paranoia/cdda.h cdio/paranoia/paranoia.h" cdio_cddap_open -lcdio_paranoia -lcdio_cdda -lcdio ||
+    die "ERROR: No usable libcdio/cdparanoia found"
 fi
 
 check_lib X11/Xlib.h XOpenDisplay -lX11 && enable xlib
@@ -4469,7 +4501,7 @@ enabled_all dxva2 CoTaskMemFree &&
     enable dxva2_lib
 
 ! enabled_any memalign posix_memalign aligned_malloc &&
-    enabled $simd_align_16 && enable memalign_hack
+    enabled simd_align_16 && enable memalign_hack
 
 map 'enabled $v && intrinsics=${v#intrinsics_}' $INTRINSICS_LIST
 

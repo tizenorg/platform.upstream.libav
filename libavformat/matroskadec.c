@@ -1825,8 +1825,12 @@ static int matroska_read_header(AVFormatContext *s)
     matroska->ctx = s;
 
     /* First read the EBML header. */
-    if (ebml_parse(matroska, ebml_syntax, &ebml) ||
-        ebml.version         > EBML_VERSION      ||
+    if (ebml_parse(matroska, ebml_syntax, &ebml) || !ebml.doctype) {
+        av_log(matroska->ctx, AV_LOG_ERROR, "EBML header parsing failed\n");
+        ebml_free(ebml_syntax, &ebml);
+        return AVERROR_INVALIDDATA;
+    }
+    if (ebml.version         > EBML_VERSION      ||
         ebml.max_size        > sizeof(uint64_t)  ||
         ebml.id_length       > sizeof(uint32_t)  ||
         ebml.doctype_version > 3) {
@@ -2532,7 +2536,7 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
                               int64_t timestamp, int flags)
 {
     MatroskaDemuxContext *matroska = s->priv_data;
-    MatroskaTrack *tracks = matroska->tracks.elem;
+    MatroskaTrack *tracks = NULL;
     AVStream *st = s->streams[stream_index];
     int i, index, index_sub, index_min;
 
@@ -2562,6 +2566,7 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
         return 0;
 
     index_min = index;
+    tracks = matroska->tracks.elem;
     for (i = 0; i < matroska->tracks.nb_elem; i++) {
         tracks[i].audio.pkt_cnt        = 0;
         tracks[i].audio.sub_packet_cnt = 0;

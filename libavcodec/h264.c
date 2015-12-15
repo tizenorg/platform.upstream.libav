@@ -686,6 +686,11 @@ static int decode_init_thread_copy(AVCodecContext *avctx)
     memset(h->sps_buffers, 0, sizeof(h->sps_buffers));
     memset(h->pps_buffers, 0, sizeof(h->pps_buffers));
 
+    h->avctx               = avctx;
+    h->rbsp_buffer[0]      = NULL;
+    h->rbsp_buffer[1]      = NULL;
+    h->rbsp_buffer_size[0] = 0;
+    h->rbsp_buffer_size[1] = 0;
     h->context_initialized = 0;
 
     return 0;
@@ -837,7 +842,7 @@ static void decode_postinit(H264Context *h, int setup_finished)
 
         av_display_rotation_set((int32_t *)rotation->data, angle);
         av_display_matrix_flip((int32_t *)rotation->data,
-                               h->sei_vflip, h->sei_hflip);
+                               h->sei_hflip, h->sei_vflip);
     }
 
     // FIXME do something with unavailable reference frames
@@ -1454,6 +1459,8 @@ static int decode_nal_units(H264Context *h, const uint8_t *buf, int buf_size,
                 buf_index = find_start_code(buf, buf_size, buf_index, next_avc);
                 if (buf_index >= buf_size)
                     break;
+                if (buf_index >= next_avc)
+                    continue;
             }
 
             hx = h->thread_context[context_count];
@@ -1679,6 +1686,7 @@ again:
             goto end;
     }
 
+    ret = 0;
 end:
     /* clean up */
     if (h->cur_pic_ptr && !h->droppable) {

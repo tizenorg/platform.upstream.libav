@@ -2447,6 +2447,9 @@ void avformat_free_context(AVFormatContext *s)
     int i, j;
     AVStream *st;
 
+    if (!s)
+        return;
+
     av_opt_free(s);
     if (s->iformat && s->iformat->priv_class && s->priv_data)
         av_opt_free(s->priv_data);
@@ -2535,6 +2538,11 @@ AVStream *avformat_new_stream(AVFormatContext *s, const AVCodec *c)
     }
 
     st->codec = avcodec_alloc_context3(c);
+    if (!st->codec) {
+        av_free(st->info);
+        av_free(st);
+        return NULL;
+    }
     if (s->iformat) {
         /* no default bitrate if decoding */
         st->codec->bit_rate = 0;

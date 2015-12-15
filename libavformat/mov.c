@@ -864,7 +864,7 @@ static int mov_read_enda(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         return 0;
     st = c->fc->streams[c->fc->nb_streams-1];
 
-    little_endian = avio_rb16(pb);
+    little_endian = !!avio_rb16(pb);
     av_dlog(c->fc, "enda %d\n", little_endian);
     if (little_endian == 1) {
         switch (st->codec->codec_id) {
@@ -1702,6 +1702,7 @@ static int mov_read_stss(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     }
     if (entries >= UINT_MAX / sizeof(int))
         return AVERROR_INVALIDDATA;
+    av_freep(&sc->keyframes);
     sc->keyframes = av_malloc(entries * sizeof(int));
     if (!sc->keyframes)
         return AVERROR(ENOMEM);
@@ -3091,7 +3092,7 @@ static int mov_read_header(AVFormatContext *s)
         MOVStreamContext *sc = st->priv_data;
 
         if (st->codec->codec_type == AVMEDIA_TYPE_SUBTITLE) {
-            if (st->codec->width <= 0 && st->codec->width <= 0) {
+            if (st->codec->width <= 0 || st->codec->height <= 0) {
                 st->codec->width  = sc->width;
                 st->codec->height = sc->height;
             }
