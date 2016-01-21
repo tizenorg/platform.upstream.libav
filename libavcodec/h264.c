@@ -28,6 +28,7 @@
 #include "libavutil/avassert.h"
 #include "libavutil/display.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/opt.h"
 #include "libavutil/stereo3d.h"
 #include "libavutil/timer.h"
 #include "internal.h"
@@ -1803,8 +1804,8 @@ out:
         ff_h264_field_end(h, 0);
 
         *got_frame = 0;
-        if (h->next_output_pic && ((avctx->flags & CODEC_FLAG_OUTPUT_CORRUPT) ||
-                                   h->next_output_pic->recovered)) {
+        if (h->next_output_pic/* && ((avctx->flags & CODEC_FLAG_OUTPUT_CORRUPT) ||
+                                   h->next_output_pic->recovered)*/) {
             if (!h->next_output_pic->recovered)
                 h->next_output_pic->f.flags |= AV_FRAME_FLAG_CORRUPT;
 
@@ -1861,6 +1862,19 @@ static const AVProfile profiles[] = {
     { FF_PROFILE_UNKNOWN },
 };
 
+static const AVOption h264_options[] = {
+    {"is_avc", "is avc", offsetof(H264Context, is_avc), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 1, 0},
+    {"nal_length_size", "nal_length_size", offsetof(H264Context, nal_length_size), AV_OPT_TYPE_INT, {.dbl = 0}, 0, 4, 0},
+    {NULL}
+};
+
+static const AVClass h264_class = {
+    "H264 Decoder",
+    av_default_item_name,
+    h264_options,
+    LIBAVUTIL_VERSION_INT,
+};
+
 AVCodec ff_h264_decoder = {
     .name                  = "h264",
     .long_name             = NULL_IF_CONFIG_SMALL("H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"),
@@ -1877,4 +1891,5 @@ AVCodec ff_h264_decoder = {
     .init_thread_copy      = ONLY_IF_THREADS_ENABLED(decode_init_thread_copy),
     .update_thread_context = ONLY_IF_THREADS_ENABLED(ff_h264_update_thread_context),
     .profiles              = NULL_IF_CONFIG_SMALL(profiles),
+    .priv_class            = &h264_class,
 };
