@@ -114,6 +114,7 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
 --disable-parsers \
 --enable-parser=aac     --enable-parser=h264            --enable-parser=mpegaudio \
 --enable-parser=h263    --enable-parser=mpeg4video      --enable-parser=mpegvideo \
+--enable-parser=hevc \
 --disable-demuxers \
 --enable-demuxer=aac    --enable-demuxer=h264   --enable-demuxer=mpegts \
 --enable-demuxer=amr    --enable-demuxer=m4v    --enable-demuxer=mpegtsraw \
@@ -121,16 +122,18 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   \
 --enable-demuxer=avi    --enable-demuxer=mov    --enable-demuxer=ogg \
 --enable-demuxer=flac   --enable-demuxer=mp3    --enable-demuxer=wav \
 --enable-demuxer=h263   --enable-demuxer=mpegps --enable-demuxer=matroska \
---enable-demuxer=dv	--enable-demuxer=flv \
+--enable-demuxer=dv		--enable-demuxer=flv	--enable-demuxer=rm \
+--enable-demuxer=aiff	--enable-muxer=mpeg1video	--enable-muxer=mpeg2video	--enable-demuxer=hevc \
 --disable-decoders \
---enable-decoder=alac   --enable-decoder=h264           --enable-decoder=wmv1 \
---enable-decoder=flac   --enable-decoder=mpeg4          --enable-decoder=wmv2 \
---enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
---enable-decoder=vc1	--enable-decoder=flv \
---enable-decoder=h263i  --enable-decoder=theora  \
---enable-decoder=pcm_alaw  --enable-decoder=pcm_mulaw  \
---enable-encoder=h263   --enable-encoder=h263p  --enable-encoder=mpeg4   \
---enable-decoder=bmp  --enable-encoder=bmp       \
+--enable-decoder=alac   --enable-decoder=h264		--enable-decoder=wmv1 \
+--enable-decoder=flac   --enable-decoder=mpeg4		--enable-decoder=wmv2 \
+--enable-decoder=h263   --enable-decoder=mpegvideo	--enable-decoder=wmv3 \
+--enable-decoder=vc1	--enable-decoder=flv 		--enable-decoder=rv40 \
+--enable-decoder=h263i  --enable-decoder=theora  	--enable-decoder=mpeg1video	--enable-decoder=mpeg2video \
+--enable-decoder=pcm_alaw  --enable-decoder=pcm_mulaw \
+--enable-decoder=msmpeg4v3	--enable-decoder=hevc	--enable-encoder=libx265 \
+--enable-encoder=h263   --enable-encoder=h263p	--enable-encoder=mpeg4 \
+--enable-decoder=bmp	--enable-encoder=bmp	--enable-encoder=mpeg1video	--enable-encoder=mpeg2video \
 --enable-decoder=tiff \
 --enable-decoder=mp3  --enable-decoder=amrnb    \
 --enable-encoder=aac  --enable-decoder=aac      \
@@ -175,11 +178,13 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -p /sbin/ldconfig
 
 %files -n libavtools
+%manifest libavtools.manifest
 %defattr(-,root,root,-)
 %{_bindir}/av*
 %{_datadir}/avconv/*.avpreset
 
 %files -n libavcodec
+%manifest libavcodec.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavcodec.so.*
 %{_datadir}/license/libavcodec
@@ -187,6 +192,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavcodec -p /sbin/ldconfig
 
 %files -n libavformat
+%manifest libavformat.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavformat.so.*
 %{_datadir}/license/libavformat
@@ -194,6 +200,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavformat -p /sbin/ldconfig
 
 %files -n libavutil
+%manifest libavutil.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavutil.so.*
 %{_datadir}/license/libavutil
@@ -201,6 +208,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavutil -p /sbin/ldconfig
 
 %files -n libavfilter
+%manifest libavfilter.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavfilter.so.*
 %{_datadir}/license/libavfilter
@@ -208,6 +216,7 @@ cp -rf %{_builddir}/%{name}-%{version}/COPYING.LGPLv2.1 %{buildroot}/%{_datadir}
 %postun -n libavfilter -p /sbin/ldconfig
 
 %files -n libswscale
+%manifest libswscale.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libswscale.so.*
 %{_datadir}/license/libswscale
