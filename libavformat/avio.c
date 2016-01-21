@@ -105,6 +105,23 @@ int ffurl_register_protocol(URLProtocol *protocol)
     return 0;
 }
 
+int ffurl_deregister_protocol(URLProtocol *protocol)
+{
+    URLProtocol **p;
+
+    p = &first_protocol;
+
+    while (*p != NULL) {
+		if(!strcmp((*p)->name, protocol->name)) {
+			*p = (*p)->next;
+			continue;
+		}
+		p = &(*p)->next;
+    }
+
+    return 0;
+}
+
 static int url_alloc_for_protocol(URLContext **puc, struct URLProtocol *up,
                                   const char *filename, int flags,
                                   const AVIOInterruptCB *int_cb)
