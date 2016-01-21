@@ -228,6 +228,11 @@ int ffurl_shutdown(URLContext *h, int flags);
 int ffurl_register_protocol(URLProtocol *protocol);
 
 /**
+ * Deregister the URLProtocol protocol.
+ */
+int ffurl_deregister_protocol(URLProtocol *protocol);
+
+/**
  * Check if the user has requested to interrup a blocking function
  * associated with cb.
  */
