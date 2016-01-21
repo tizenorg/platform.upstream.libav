@@ -31,6 +31,7 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/channel_layout.h"
+#include "libavutil/display.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/intfloat.h"
 #include "libavutil/mathematics.h"
@@ -2453,6 +2454,7 @@ static int mov_read_tkhd(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         display_matrix[1][0] || display_matrix[1][2] ||
         display_matrix[2][0] || display_matrix[2][1]) {
         int i, j;
+        double rotate;
 
         av_freep(&sc->display_matrix);
         sc->display_matrix = av_malloc(sizeof(int32_t) * 9);
@@ -2462,6 +2464,16 @@ static int mov_read_tkhd(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         for (i = 0; i < 3; i++)
             for (j = 0; j < 3; j++)
                 sc->display_matrix[i * 3 + j] = display_matrix[j][i];
+
+        rotate = av_display_rotation_get(sc->display_matrix);
+        if (!isnan(rotate)) {
+            char rotate_buf[64];
+            rotate = -rotate;
+            if (rotate < 0) // for backward compatibility
+                rotate += 360;
+            snprintf(rotate_buf, sizeof(rotate_buf), "%g", rotate);
+            av_dict_set(&st->metadata, "rotate", rotate_buf, 0);
+        }
     }
 
     // transform the display width/height according to the matrix
