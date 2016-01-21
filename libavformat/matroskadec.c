@@ -60,6 +60,9 @@
 #include "riff.h"
 #include "rmsipr.h"
 
+#define LIMIT_ATTACHMENT_MEMORY_USE
+#define ATTACHMENT_MEMORY_MAX (5 * 1024 * 1024)
+#define FIX_CRASH_ISSUE_FOR_INVALID_FILE
 typedef enum {
     EBML_NONE,
     EBML_UINT,
@@ -271,6 +274,9 @@ typedef struct {
 
     /* File has SSA subtitles which prevent incremental cluster parsing. */
     int contains_ssa;
+#ifdef FIX_CRASH_ISSUE_FOR_INVALID_FILE
+	int is_parse_header_finish;
+#endif
 } MatroskaDemuxContext;
 
 typedef struct {
@@ -923,6 +929,12 @@ static int ebml_parse_elem(MatroskaDemuxContext *matroska,
             return AVERROR_INVALIDDATA;
         }
     }
+#ifdef FIX_CRASH_ISSUE_FOR_INVALID_FILE
+    if((length == 0xffffffffffffffULL) && (matroska->is_parse_header_finish == 0)) {
+        av_log(NULL, AV_LOG_INFO, "LY_DBG: WE DTECTED THIS CONTENT IS A TORRENT FILE!!!\n");
+        return AVERROR_INVALIDDATA;
+    }
+#endif
 
     switch (syntax->type) {
     case EBML_UINT:
@@ -936,6 +948,26 @@ static int ebml_parse_elem(MatroskaDemuxContext *matroska,
         res = ebml_read_ascii(pb, length, data);
         break;
     case EBML_BIN:
+		#ifdef LIMIT_ATTACHMENT_MEMORY_USE
+		/* some mkv test file has huge attachment data, see defect: W0000246647,
+		    this file attchment use more than 46M memory, so in some platform, for
+		    example: NVT platform, its memroy is small, this situtation will cause
+		    system crash, and currently, Uniplayer does not use attchment data, 
+		    attchment data is some metadata of matroska, so add this patch to avoid
+		    this kind issue.
+		*/
+		if(id == MATROSKA_ID_FILEDATA) {
+			if(length > ATTACHMENT_MEMORY_MAX) {
+				EbmlBin *file_data = (EbmlBin*)data;
+				file_data->size = 0;
+				file_data->data = NULL;
+				file_data->pos = avio_tell(pb);
+				avio_skip(pb, length);
+				res = 0;
+				break;
+			}
+		 }
+		#endif
         res = ebml_read_binary(pb, length, data);
         break;
     case EBML_NEST:
@@ -1824,6 +1856,10 @@ static int matroska_read_header(AVFormatContext *s)
 
     matroska->ctx = s;
 
+#ifdef FIX_CRASH_ISSUE_FOR_INVALID_FILE
+    matroska->is_parse_header_finish = 0;
+#endif
+
     /* First read the EBML header. */
     if (ebml_parse(matroska, ebml_syntax, &ebml) || !ebml.doctype) {
         av_log(matroska->ctx, AV_LOG_ERROR, "EBML header parsing failed\n");
@@ -1856,6 +1892,13 @@ static int matroska_read_header(AVFormatContext *s)
     /* The next thing is a segment. */
     pos = avio_tell(matroska->ctx->pb);
     res = ebml_parse(matroska, matroska_segments, matroska);
+#ifdef FIX_CRASH_ISSUE_FOR_INVALID_FILE
+	if(res<0){
+		av_log(NULL, AV_LOG_INFO, "LY_DBG: TORRENT FILE, WE QUIT!!!\n");
+		ebml_free(matroska_segments, matroska);
+		return AVERROR_INVALIDDATA;
+	}
+#endif
     // try resyncing until we find a EBML_STOP type element.
     while (res != 1) {
         res = matroska_resync(matroska, pos);
@@ -1864,6 +1907,9 @@ static int matroska_read_header(AVFormatContext *s)
         pos = avio_tell(matroska->ctx->pb);
         res = ebml_parse(matroska, matroska_segment, matroska);
     }
+#ifdef FIX_CRASH_ISSUE_FOR_INVALID_FILE
+	matroska->is_parse_header_finish = 1;
+#endif
     matroska_execute_seekhead(matroska);
 
     if (!matroska->time_scale)
