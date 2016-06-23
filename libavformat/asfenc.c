@@ -410,7 +410,7 @@ static int asf_write_header1(AVFormatContext *s, int64_t file_size,
     avio_wl64(pb, unix_to_file_time(file_time));
     avio_wl64(pb, asf->nb_packets); /* number of packets */
     avio_wl64(pb, play_duration); /* end time stamp (in 100ns units) */
-    avio_wl64(pb, send->duration); /* duration (in 100ns units) */
+    avio_wl64(pb, send_duration); /* duration (in 100ns units) */
     avio_wl64(pb, PREROLL_TIME); /* start time stamp */
     avio_wl32(pb, (asf->is_streamed || !pb->seekable) ? 3 : 2);  /* ??? */
     avio_wl32(pb, s->packet_size); /* packet size */
@@ -866,10 +866,6 @@ static int asf_write_packet(AVFormatContext *s, AVPacket *pkt)
     /* check index */
     if ((!asf->is_streamed) && (flags & AV_PKT_FLAG_KEY)) {
         if (pts / 1000LL > INT_MAX)
-            return AVERROR(ERANGE);
-
-        start_sec = pts / 1000;
-        if (start_sec != asf->last_indexed_pts / 1000) {        if (pts / 1000LL > INT_MAX)
             return AVERROR(ERANGE);
 
         start_sec = pts / 1000;
