@@ -1578,6 +1578,13 @@ int attribute_align_arg avcodec_decode_video2(AVCodecContext *avctx, AVFrame *pi
     AVCodecInternal *avci = avctx->internal;
     int ret;
 
+    if (!avctx->codec)
+        return AVERROR(EINVAL);
+    if (avctx->codec->type != AVMEDIA_TYPE_VIDEO) {
+        av_log(avctx, AV_LOG_ERROR, "Invalid media type for video\n");
+        return AVERROR(EINVAL);
+    }
+
     *got_picture_ptr = 0;
     if ((avctx->coded_width || avctx->coded_height) && av_image_check_size(avctx->coded_width, avctx->coded_height, 0, avctx))
         return -1;
